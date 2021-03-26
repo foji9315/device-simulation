@@ -9,4 +9,6 @@ public interface DeviceService {
     Object setLocation(String latitude, String longitude);
 
     Object getLocation();
+
+    Object getInstructions();
 }

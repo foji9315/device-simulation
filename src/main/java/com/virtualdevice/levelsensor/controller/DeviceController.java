@@ -34,4 +34,9 @@ public class DeviceController {
     public Object getCurrentLocation() {
         return deviceService.getLocation();
     }
+
+    @GetMapping("/instructions")
+    public Object getInstructions() {
+        return deviceService.getInstructions();
+    }
 }
