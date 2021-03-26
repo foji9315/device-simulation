@@ -55,8 +55,8 @@ public class DeviceServiceImpl implements DeviceService {
         asyncEnable = activationFlag;
         while(asyncEnable) {
             String timeStamp = LocalTime.now().plusSeconds(5).format(DateTimeFormatter.ISO_TIME);
-            double percetange = Math.random() * (max - min + 1) + min;
-            DeviceData deviceData = new DeviceData(percetange, timeStamp, longitude, latitude);
+            double percentage = Math.random() * (max - min + 1) + min;
+            DeviceData deviceData = new DeviceData(percentage, timeStamp, longitude, latitude);
             thingsBoardAdaptor.postDeviceData(deviceData);
         }
     }
