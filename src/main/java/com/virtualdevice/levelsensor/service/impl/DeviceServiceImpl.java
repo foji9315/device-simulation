@@ -4,6 +4,7 @@ import com.virtualdevice.levelsensor.adaptor.ThingsBoardAdaptor;
 import com.virtualdevice.levelsensor.exception.BadRequestException;
 import com.virtualdevice.levelsensor.model.DeviceData;
 import com.virtualdevice.levelsensor.service.DeviceService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -12,23 +13,24 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
+@Slf4j
 public class DeviceServiceImpl implements DeviceService {
 
     private static final int max = 100;
     private static final int min = 0;
     private static final String RESPONSE_STATUS = "The current status for simulation data is %s";
-    private static final String RESPONSE_LOCATION = "The current lcation is lat: %s , lon: %s";
+    private static final String RESPONSE_LOCATION = "The current location is lat: %s , lon: %s";
 
     private static final String INSTRUCTIONS = "To activate simulation please click in: " +
-            " <a href='.?activate=true'> Activate </a> <br>" +
+            " <a href='.?activate=true'> Activate </a> or <a href='.?activate=false'> Disable </a> <br>" +
             "To look current status click here: " +
             "<a href='./status'> Status </a> </br>" +
             "To change location go to ./poc/device/location/change?lat={value}&lon={value} <br>" +
             "To look current location click here: " +
             "<a href='./location'> Location </a> </br>";
 
-    private static final String ACTIVE= "ACTIVE";
-    private static final String INACTIVE= "INACTIVE";
+    private static final String ACTIVE = "ACTIVE";
+    private static final String INACTIVE = "INACTIVE";
 
     private static String longitude = "-99.1920792";
     private static String latitude = "19.3313681";
@@ -67,24 +69,27 @@ public class DeviceServiceImpl implements DeviceService {
     @Async
     public void runSimulation(boolean activationFlag) {
         asyncEnable = activationFlag;
-        try{
-            while(asyncEnable) {
-                String timeStamp = LocalTime.now().plusSeconds(5).format(DateTimeFormatter.ISO_TIME);
+        try {
+            while (asyncEnable) {
+                Thread.sleep(5000);
+                String timeStamp = LocalTime.now().format(DateTimeFormatter.ISO_TIME);
                 double percentage = Math.random() * (max - min + 1) + min;
                 DeviceData deviceData = new DeviceData(percentage, timeStamp, longitude, latitude);
+                log.info("Sending another post: " + deviceData);
                 thingsBoardAdaptor.postDeviceData(deviceData);
             }
-        } catch (Exception ex){
+        } catch (Exception ex) {
+            asyncEnable = false;
             throw new BadRequestException("We got an exception: " + ex);
         }
 
     }
 
-    private String getStatusOfSimulation(){
-        return String.format(RESPONSE_STATUS,asyncEnable ? ACTIVE : INACTIVE);
+    private String getStatusOfSimulation() {
+        return String.format(RESPONSE_STATUS, asyncEnable ? ACTIVE : INACTIVE);
     }
 
-    private String getCurrentLocation(){
-        return String.format(RESPONSE_LOCATION,DeviceServiceImpl.latitude,DeviceServiceImpl.longitude);
+    private String getCurrentLocation() {
+        return String.format(RESPONSE_LOCATION, DeviceServiceImpl.latitude, DeviceServiceImpl.longitude);
     }
 }

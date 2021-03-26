@@ -23,21 +23,21 @@ public class ThingsBoardAdaptor {
     @Value("${thingsBoard.token}")
     private String token;
 
-    public Object postDeviceData(DeviceData deviceData){
+    public Object postDeviceData(DeviceData deviceData) {
         String url = getThingsBoardUrl();
         ResponseEntity<Object> serviceResponse = null;
         try {
             HttpHeaders header = new HttpHeaders();
             header.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Object> request = new HttpEntity<>(deviceData,header);
-            serviceResponse = restTemplate.exchange(url, HttpMethod.POST,request,Object.class);
+            HttpEntity<Object> request = new HttpEntity<>(deviceData, header);
+            serviceResponse = restTemplate.exchange(url, HttpMethod.POST, request, Object.class);
             return serviceResponse;
         } catch (Exception e) {
-            throw new BadRequestException(String.format(PROBLEM_SENDING_DATA,e.getMessage()));
+            throw new BadRequestException(String.format(PROBLEM_SENDING_DATA, e.getMessage()));
         }
     }
 
     private String getThingsBoardUrl() {
-        return baseUrl  + token + TELEMETRY;
+        return baseUrl + token + TELEMETRY;
     }
 }
